@@ -4,13 +4,16 @@ using System.Collections.Generic;
 
 public class MovementInputs : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private SphereMovement sphereMovement;
+
+    [Header("Buttons")]
     [SerializeField] private Button leftButton;
     [SerializeField] private Button rightButton;
     [SerializeField] private Button upButton;
     [SerializeField] private Button downButton;
 
     [SerializeField] private Button beginButton;
-    [SerializeField] private SphereMovement sphereMovement;
 
     private List<MovementDirection> movementSequence = new List<MovementDirection>();
 
@@ -26,51 +29,50 @@ public class MovementInputs : MonoBehaviour
 
     private void OnLeftPressed()
     {
+        if (sphereMovement.isMoving) return;
+
         Debug.Log("Left Button Pressed");
 
-        if (sphereMovement.isMoving) return;
         movementSequence.Add(MovementDirection.Left);
     }
 
     private void OnRightPressed()
     {
+        if (sphereMovement.isMoving) return;
+
         Debug.Log("Right Button Pressed");
 
-        if (sphereMovement.isMoving) return;
         movementSequence.Add(MovementDirection.Right);
     }
 
     private void OnUpPressed()
     {
+        if (sphereMovement.isMoving) return;
+
         Debug.Log("Up Button Pressed");
 
-        if (sphereMovement.isMoving) return;
         movementSequence.Add(MovementDirection.Up);
     }
 
     private void OnDownPressed()
     {
+        if (sphereMovement.isMoving) return;
+
         Debug.Log("Down Button Pressed");
 
-        if (sphereMovement.isMoving) return;
         movementSequence.Add(MovementDirection.Down);
     }
 
     private void OnBeginPressed()
     {
+        if (sphereMovement.isMoving) return;
+
         Debug.Log("Begin Button Pressed");
 
-        if (sphereMovement.isMoving) return;
         sphereMovement.ExecuteMovement(movementSequence);
+
+        movementSequence.Clear();
     }
-
-
-
-
-
-
-
-
 
 
 

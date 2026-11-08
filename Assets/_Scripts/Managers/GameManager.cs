@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 
     //[SerializeField] private SphereMovement sphereMovement;
 
-    private bool levelCompleted = false;
+    public bool levelCompleted { get; private set; } = false;
 
     private void Awake()
     {
@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
+    public void LevelInProgress()
+    {
+
+    }
+
     public void LevelComplete()
     {
         if (levelCompleted) return;
@@ -26,6 +31,12 @@ public class GameManager : MonoBehaviour
         levelCompleted = true;
 
         Debug.Log("Level Complete!");
+    }
+
+
+    public void ResetLevel()
+    {
+
     }
 
 

@@ -4,51 +4,82 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(SphereCollider))]
+
 public class SphereMovement : MonoBehaviour
 {
+    private Rigidbody rb;
+    private SphereCollider sphereCollider;
+
+    [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
 
-    private Rigidbody rb;
-    private bool hitWall;
+    [Header("Movement Bools")]
     public bool isMoving { get; private set; } = false;
+
+    [Header("Wall Detection")]
+    [SerializeField] private LayerMask wallLayer;
+    [SerializeField] private float wallStopDistance = 0.5f;
+
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        sphereCollider = GetComponent<SphereCollider>();
     }
 
     public void ExecuteMovement(List<MovementDirection> movementSequence)
     {
         if (isMoving || movementSequence == null || movementSequence.Count == 0) return;
 
+        isMoving = true;
+        Debug.Log("IsMoving = true");
+
         StartCoroutine(MoveSequence(new List<MovementDirection>(movementSequence)));
     }
 
     private IEnumerator MoveSequence(List<MovementDirection> movementSequence)
     {
-        isMoving = true;
-        Debug.Log("IsMoving = true");
-
         foreach (MovementDirection direction in movementSequence)
         {
-            hitWall = false;
-
             Vector3 moveDirection = GetDirection(direction);
+            Debug.Log("Moving: " + direction);
 
-            while (!hitWall)
+            while (!CheckForWall(moveDirection))
             {
                 rb.linearVelocity = moveDirection * moveSpeed;
                 yield return new WaitForFixedUpdate();
             }
 
             rb.linearVelocity = Vector3.zero;
+
             yield return new WaitForFixedUpdate();
         }
 
+        rb.linearVelocity = Vector3.zero;
+
         isMoving = false;
+
         Debug.Log("IsMoving = false");
         Debug.Log("Movement sequence completed");
     }
+
+
+    private bool CheckForWall(Vector3 direction)
+    {
+        Vector3 origin = transform.TransformPoint(sphereCollider.center);
+
+        float radius = sphereCollider.radius * Mathf.Max(
+            Mathf.Abs(transform.lossyScale.x),
+            Mathf.Abs(transform.lossyScale.y),
+            Mathf.Abs(transform.lossyScale.z)
+        );
+
+        float checkDistance = moveSpeed * Time.fixedDeltaTime + wallStopDistance;
+
+        return Physics.SphereCast(origin, radius, direction, out RaycastHit hit, checkDistance, wallLayer, QueryTriggerInteraction.Ignore);
+    }
+
 
     private Vector3 GetDirection(MovementDirection direction)
     {
@@ -64,25 +95,12 @@ public class SphereMovement : MonoBehaviour
                 return Vector3.forward;
 
             case MovementDirection.Down:
-                return Vector3.down;
+                return Vector3.back;
 
             default:
                 return Vector3.zero;
         }
     }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            hitWall = true;
-        }
-    }
-
-
-
-
-
 
 
 }
