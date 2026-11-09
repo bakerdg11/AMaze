@@ -50,8 +50,6 @@ public class MenuManager : MonoBehaviour
         hudPanel.SetActive(true);
 
         GameManager.Instance.LoadLevel(1);
-
-        Debug.Log("Level 1 Selected");
     }
 
     private void QuitGame()

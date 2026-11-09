@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LevelData[] levels;
     [SerializeField] private GameObject spherePrefab;
 
+    public GameState CurrentState { get; private set; } = GameState.MainMenu;
+
     private GameObject currentLevel;
     private GameObject currentSphere;
 
@@ -22,7 +24,20 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
+
+        Debug.Log($"GameState Changed: {CurrentState}");
     }
+
+
+    private void SetGameState(GameState newState)
+    {
+        if (CurrentState == newState) return;
+
+        CurrentState = newState;
+
+        Debug.Log($"GameState Changed: {CurrentState}");
+    }
+
 
     public void LoadLevel(int levelNumber)
     {
@@ -76,8 +91,21 @@ public class GameManager : MonoBehaviour
 
         levelCompleted = false;
 
+        SetGameState(GameState.Preparation);
+
         Debug.Log($"Level {levelNumber} Loaded!");
     }
+
+
+
+    public void BeginExecution()
+    {
+        if (CurrentState != GameState.Preparation) return;
+
+        SetGameState(GameState.Execution);
+    }
+
+
 
     public void LevelInProgress()
     {
@@ -86,11 +114,26 @@ public class GameManager : MonoBehaviour
 
     public void LevelComplete()
     {
-        if (levelCompleted) return;
+        if (CurrentState != GameState.Execution || levelCompleted) return;
 
         levelCompleted = true;
 
+        SetGameState(GameState.Won);
+
         Debug.Log("Level Complete!");
+    }
+
+    public void CheckLevelResult()
+    {
+        if (levelCompleted)
+        {
+            Debug.Log("You win!");
+        }
+        else
+        {
+            SetGameState(GameState.Lost);
+            Debug.Log("You lost!");
+        }
     }
 
     public void ResetLevel()

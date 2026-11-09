@@ -43,7 +43,6 @@ public class SphereMovement : MonoBehaviour
         foreach (MovementDirection direction in movementSequence)
         {
             Vector3 moveDirection = GetDirection(direction);
-            Debug.Log("Moving: " + direction);
 
             while (!CheckForWall(moveDirection))
             {
@@ -59,9 +58,9 @@ public class SphereMovement : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
 
         isMoving = false;
-
         Debug.Log("IsMoving = false");
-        Debug.Log("Movement sequence completed");
+
+        GameManager.Instance.CheckLevelResult();
     }
 
 
