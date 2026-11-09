@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
   LevelNumber: 1
   LevelName: Tutorial 1
-  LevelPrefab: {fileID: 0}
+  LevelPrefab: {fileID: 4697647715549592905, guid: 081af319b392f6d47a3561652f24d615, type: 3}
+  CameraPosition: {x: 0, y: 15, z: 0}
+  CameraOrthographicSize: 10
   MaxMovementCommands: 3
   MaxObjectsToPlace: 0

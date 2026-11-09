@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class MovementInputs : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private SphereMovement sphereMovement;
+    private SphereMovement sphereMovement => GameManager.Instance != null ? GameManager.Instance.CurrentSphereMovement : null;
 
     [Header("Buttons")]
     [SerializeField] private Button leftButton;
@@ -26,10 +26,14 @@ public class MovementInputs : MonoBehaviour
         beginButton.onClick.AddListener(OnBeginPressed);
     }
 
+    private bool CanEnterInput()
+    {
+        return sphereMovement != null && !sphereMovement.isMoving && !GameManager.Instance.levelCompleted;
+    }
 
     private void OnLeftPressed()
     {
-        if (sphereMovement.isMoving) return;
+        if (!CanEnterInput()) return;
 
         Debug.Log("Left Button Pressed");
 
@@ -38,7 +42,7 @@ public class MovementInputs : MonoBehaviour
 
     private void OnRightPressed()
     {
-        if (sphereMovement.isMoving) return;
+        if (!CanEnterInput()) return;
 
         Debug.Log("Right Button Pressed");
 
@@ -47,7 +51,7 @@ public class MovementInputs : MonoBehaviour
 
     private void OnUpPressed()
     {
-        if (sphereMovement.isMoving) return;
+        if (!CanEnterInput()) return;
 
         Debug.Log("Up Button Pressed");
 
@@ -56,7 +60,7 @@ public class MovementInputs : MonoBehaviour
 
     private void OnDownPressed()
     {
-        if (sphereMovement.isMoving) return;
+        if (!CanEnterInput()) return;
 
         Debug.Log("Down Button Pressed");
 
@@ -65,7 +69,8 @@ public class MovementInputs : MonoBehaviour
 
     private void OnBeginPressed()
     {
-        if (sphereMovement.isMoving) return;
+        if (!CanEnterInput()) return;
+        if (movementSequence.Count == 0) return;
 
         Debug.Log("Begin Button Pressed");
 
