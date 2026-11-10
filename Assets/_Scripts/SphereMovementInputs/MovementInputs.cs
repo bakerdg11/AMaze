@@ -26,9 +26,19 @@ public class MovementInputs : MonoBehaviour
         beginButton.onClick.AddListener(OnBeginPressed);
     }
 
+    public List<MovementDirection> GetMovementSequence()
+    {
+        return new List<MovementDirection>(movementSequence);
+    }
+
     private bool CanEnterInput()
     {
         return GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Preparation;
+    }
+
+    public void ResetInputs()
+    {
+        movementSequence.Clear();
     }
 
     private void OnLeftPressed()
@@ -72,14 +82,9 @@ public class MovementInputs : MonoBehaviour
         if (!CanEnterInput()) return;
 
         GameManager.Instance.BeginExecution();
-
-        if (movementSequence.Count > 0)
-        {
-            sphereMovement.ExecuteMovement(movementSequence);
-        }
-
-        movementSequence.Clear();
     }
+
+
 
 
 

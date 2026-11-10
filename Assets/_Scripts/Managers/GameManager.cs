@@ -1,16 +1,32 @@
 using UnityEngine;
+using System;
+using TMPro;
+using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    [SerializeField] private MovementInputs movementInputs;
+
     [SerializeField] private LevelData[] levels;
     [SerializeField] private GameObject spherePrefab;
 
     public GameState CurrentState { get; private set; } = GameState.MainMenu;
+    public event Action<GameState> OnGameStateChanged;
+    public int CurrentLevelNumber { get; private set; } = -1;
 
     private GameObject currentLevel;
     private GameObject currentSphere;
+
+    [Header("Preparation Timer")]
+    [SerializeField] private TMP_Text countdownText;
+    [SerializeField] private float preparationTime = 7f;
+
+    private float remainingTime;
+    private Coroutine countdownCoroutine;
 
     public SphereMovement CurrentSphereMovement { get; private set; }
     public bool levelCompleted { get; private set; } = false;
@@ -36,6 +52,8 @@ public class GameManager : MonoBehaviour
         CurrentState = newState;
 
         Debug.Log($"GameState Changed: {CurrentState}");
+
+        OnGameStateChanged?.Invoke(CurrentState);
     }
 
 
@@ -91,9 +109,47 @@ public class GameManager : MonoBehaviour
 
         levelCompleted = false;
 
-        SetGameState(GameState.Preparation);
+        CurrentLevelNumber = levelNumber;
+
+        StartPreparation();
 
         Debug.Log($"Level {levelNumber} Loaded!");
+    }
+
+
+
+    private void StartPreparation()
+    {
+        SetGameState(GameState.Preparation);
+
+        remainingTime = preparationTime;
+
+        countdownText.gameObject.SetActive(true);
+        countdownText.text = Mathf.CeilToInt(remainingTime).ToString();
+
+        if (countdownCoroutine != null) StopCoroutine(countdownCoroutine);
+
+        countdownCoroutine = StartCoroutine(PreparationCountdown());
+    }
+
+    private IEnumerator PreparationCountdown()
+    {
+        while (remainingTime > 0f && CurrentState == GameState.Preparation)
+        {
+            remainingTime -= Time.deltaTime;
+            remainingTime = Mathf.Max(remainingTime, 0f);
+
+            countdownText.text = Mathf.CeilToInt(remainingTime).ToString();
+
+            yield return null;
+        }
+
+        countdownCoroutine = null;
+
+        if (CurrentState == GameState.Preparation)
+        {
+            BeginExecution();
+        }
     }
 
 
@@ -102,7 +158,39 @@ public class GameManager : MonoBehaviour
     {
         if (CurrentState != GameState.Preparation) return;
 
+        if (countdownCoroutine != null)
+        {
+            StopCoroutine(countdownCoroutine);
+            countdownCoroutine = null;
+        }
+
+        countdownText.gameObject.SetActive(false);
+
         SetGameState(GameState.Execution);
+
+        if (CurrentSphereMovement == null || movementInputs == null)
+        {
+            Debug.LogError("SphereMovement or MovementInputs reference is missing!");
+            CheckLevelResult();
+            return;
+        }
+
+        List<MovementDirection> sequence = movementInputs.GetMovementSequence();
+
+        if (sequence.Count == 0)
+        {
+            Debug.Log("No movement sequence entered");
+            CheckLevelResult();
+            return;
+        }
+
+        CurrentSphereMovement.ExecuteMovement(sequence);
+
+        movementInputs.ResetInputs();
+
+        Debug.Log("Execution phase started");
+
+
     }
 
 
@@ -138,7 +226,15 @@ public class GameManager : MonoBehaviour
 
     public void ResetLevel()
     {
+        if (CurrentLevelNumber < 0)
+        {
+            Debug.LogWarning("No level is currently loaded");
+            return;
+        }
 
+        movementInputs.ResetInputs();
+
+        LoadLevel(CurrentLevelNumber);
     }
 
     private void OnDestroy()
