@@ -1,5 +1,5 @@
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AdaptivePerformance;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
@@ -17,7 +17,9 @@ public class MenuManager : MonoBehaviour
 
     [Header("Level Select Buttons")]
     [SerializeField] private Button backButton;
-    [SerializeField] private Button level1Button;
+    [SerializeField] private LevelButtonUI levelButtonPrefab;
+    [SerializeField] private Transform levelButtonContainer;
+    [SerializeField] private LevelData[] levels;
 
     [Header("Win Panel Buttons")]
     [SerializeField] private Button winTryAgainButton;
@@ -36,7 +38,6 @@ public class MenuManager : MonoBehaviour
 
         // Level Select Buttons
         backButton.onClick.AddListener(CloseLevelSelect);
-        level1Button.onClick.AddListener(PlayLevel1);
 
         // Win Panel Buttons
         winTryAgainButton.onClick.AddListener(WinTryAgain);
@@ -57,9 +58,28 @@ public class MenuManager : MonoBehaviour
         winPanel.SetActive(false);
         losePanel.SetActive(false);
 
+        GenerateLevelButtons();
+
         GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
 
         HandleGameStateChanged(GameManager.Instance.CurrentState);
+    }
+
+    private void GenerateLevelButtons()
+    {
+        foreach (Transform child in levelButtonContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (LevelData level in levels)
+        {
+            if (level == null) continue;
+
+            LevelButtonUI newButton = Instantiate(levelButtonPrefab, levelButtonContainer);
+
+            newButton.Setup(level.LevelNumber, PlayLevel);
+        }
     }
 
     private void HandleGameStateChanged(GameState newState)
@@ -67,6 +87,7 @@ public class MenuManager : MonoBehaviour
         winPanel.SetActive(newState == GameState.Won);
         losePanel.SetActive(newState == GameState.Lost);
     }
+
     private void OnDestroy()
     {
         if (GameManager.Instance != null)
@@ -94,11 +115,10 @@ public class MenuManager : MonoBehaviour
         levelSelectPanel.SetActive(false);
     }
 
-    private void PlayLevel1()
+    private void PlayLevel(int levelNumber)
     {
+        GameManager.Instance.LoadLevel(levelNumber);
         BeginGame();
-
-        GameManager.Instance.LoadLevel(1);
     }
 
     private void WinNextLevel()
@@ -108,24 +128,26 @@ public class MenuManager : MonoBehaviour
 
     private void WinTryAgain()
     {
-        BeginGame();
         GameManager.Instance.ResetLevel();
+        BeginGame();
     }
 
     private void WinSelectLevel()
     {
+        hudPanel.SetActive(false);
         levelSelectPanel.SetActive(true);
         winPanel.SetActive(false);
     }
 
     private void LoseTryAgain()
     {
-        BeginGame();
         GameManager.Instance.ResetLevel();
+        BeginGame();
     }
 
     private void LoseSelectLevel()
     {
+        hudPanel.SetActive(false);
         levelSelectPanel.SetActive(true);
         losePanel.SetActive(false);
     }
