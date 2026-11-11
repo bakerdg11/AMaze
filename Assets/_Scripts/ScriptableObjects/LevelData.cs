@@ -15,7 +15,7 @@ public class LevelData : ScriptableObject
     public float CameraOrthographicSize = 10f;
 
     [Header("Level Settings")]
-    public int MaxMovementCommands;
+    public int HighScoreMovementSequence;
     public int MaxObjectsToPlace;
     
 }

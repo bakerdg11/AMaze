@@ -194,12 +194,6 @@ public class GameManager : MonoBehaviour
     }
 
 
-
-    public void LevelInProgress()
-    {
-
-    }
-
     public void LevelComplete()
     {
         if (CurrentState != GameState.Execution || levelCompleted) return;
@@ -236,6 +230,20 @@ public class GameManager : MonoBehaviour
 
         LoadLevel(CurrentLevelNumber);
     }
+
+    public void LoadNextLevel()
+    {
+        int nextLevelNumber = CurrentLevelNumber + 1;
+
+        foreach (LevelData level in levels)
+        {
+            if (level == null || level.LevelNumber != nextLevelNumber) continue;
+
+            LoadLevel(nextLevelNumber);
+            return;
+        }
+    }
+
 
     private void OnDestroy()
     {

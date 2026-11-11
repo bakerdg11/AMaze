@@ -123,7 +123,16 @@ public class MenuManager : MonoBehaviour
 
     private void WinNextLevel()
     {
-        Debug.Log("Move to next level");
+        if (GameManager.Instance == null) return;
+
+        int previousLevel = GameManager.Instance.CurrentLevelNumber;
+
+        GameManager.Instance.LoadNextLevel();
+
+        if (GameManager.Instance.CurrentLevelNumber != previousLevel)
+        {
+            BeginGame();
+        }
     }
 
     private void WinTryAgain()
