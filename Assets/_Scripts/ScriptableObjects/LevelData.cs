@@ -10,12 +10,8 @@ public class LevelData : ScriptableObject
     [Header("Level Prefab")]
     public GameObject LevelPrefab;
 
-    [Header("Camera Settings")]
-    public Vector3 CameraPosition = new Vector3(0f, 15f, 0f);
-    public float CameraOrthographicSize = 10f;
-
     [Header("Level Settings")]
-    public int HighScoreMovementSequence;
-    public int MaxObjectsToPlace;
+    public float PreparationTime;
+    public int MinimumMovesToComplete;
     
 }

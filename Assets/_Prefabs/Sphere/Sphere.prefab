@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8dd48459f90ffd4ebe8b66f6c342ecc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SphereMovement
-  moveSpeed: 5
+  moveSpeed: 10
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
