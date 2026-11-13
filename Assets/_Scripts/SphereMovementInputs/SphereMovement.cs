@@ -40,8 +40,12 @@ public class SphereMovement : MonoBehaviour
 
     private IEnumerator MoveSequence(List<MovementDirection> movementSequence)
     {
-        foreach (MovementDirection direction in movementSequence)
+        for (int i = 0; i < movementSequence.Count; i ++)
         {
+            MovementDirection direction = movementSequence[i];
+
+            GameManager.Instance.HighlightCurrentMovement(i);
+
             Vector3 moveDirection = GetDirection(direction);
 
             while (!CheckForWall(moveDirection))
@@ -59,6 +63,8 @@ public class SphereMovement : MonoBehaviour
 
         isMoving = false;
         Debug.Log("IsMoving = false");
+
+        GameManager.Instance.HighlightCurrentMovement(-1);
 
         GameManager.Instance.CheckLevelResult();
     }

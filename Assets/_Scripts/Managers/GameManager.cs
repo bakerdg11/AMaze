@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
     public int CurrentLevelNumber { get; private set; } = -1;
     public LevelData CurrentLevelData { get; private set; }
 
+    public int InputsUsed { get; private set; }
+
     private GameObject currentLevel;
     private GameObject currentSphere;
 
@@ -57,6 +59,11 @@ public class GameManager : MonoBehaviour
         CurrentState = newState;
 
         Debug.Log($"GameState Changed: {CurrentState}");
+
+        if (newState == GameState.Won || newState == GameState.Lost)
+        {
+            movementInputs.ResetInputs();
+        }
 
         OnGameStateChanged?.Invoke(CurrentState);
     }
@@ -261,6 +268,9 @@ public class GameManager : MonoBehaviour
 
         List<MovementDirection> sequence = movementInputs.GetMovementSequence();
 
+        // Sets InputsUsed as the amount of inputs pressed to check record
+        InputsUsed = sequence.Count;
+
         if (sequence.Count == 0)
         {
             Debug.Log("No movement sequence entered");
@@ -270,11 +280,19 @@ public class GameManager : MonoBehaviour
 
         CurrentSphereMovement.ExecuteMovement(sequence);
 
-        movementInputs.ResetInputs();
+        movementInputs.ClearStoredInputs();
 
         Debug.Log("Execution phase started");
 
 
+    }
+
+
+    public void HighlightCurrentMovement(int index)
+    {
+        if (movementInputs == null) return;
+
+        movementInputs.HighlightMovement(index);
     }
 
 

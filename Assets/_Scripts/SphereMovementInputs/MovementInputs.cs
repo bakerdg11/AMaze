@@ -15,6 +15,9 @@ public class MovementInputs : MonoBehaviour
 
     [SerializeField] private Button beginButton;
 
+    [Header("Arrow Display UI")]
+    [SerializeField] private MovementSequenceUI movementSequenceUI;
+
     private List<MovementDirection> movementSequence = new List<MovementDirection>();
 
     private void Awake()
@@ -39,6 +42,12 @@ public class MovementInputs : MonoBehaviour
     public void ResetInputs()
     {
         movementSequence.Clear();
+        movementSequenceUI.ClearSequence();
+    }
+
+    public void ClearStoredInputs()
+    {
+        movementSequence.Clear();
     }
 
     private void OnLeftPressed()
@@ -48,6 +57,7 @@ public class MovementInputs : MonoBehaviour
         Debug.Log("Left Button Pressed");
 
         movementSequence.Add(MovementDirection.Left);
+        movementSequenceUI.AddMovement(MovementDirection.Left);
     }
 
     private void OnRightPressed()
@@ -57,6 +67,7 @@ public class MovementInputs : MonoBehaviour
         Debug.Log("Right Button Pressed");
 
         movementSequence.Add(MovementDirection.Right);
+        movementSequenceUI.AddMovement(MovementDirection.Right);
     }
 
     private void OnUpPressed()
@@ -66,6 +77,7 @@ public class MovementInputs : MonoBehaviour
         Debug.Log("Up Button Pressed");
 
         movementSequence.Add(MovementDirection.Up);
+        movementSequenceUI.AddMovement(MovementDirection.Up);
     }
 
     private void OnDownPressed()
@@ -75,6 +87,7 @@ public class MovementInputs : MonoBehaviour
         Debug.Log("Down Button Pressed");
 
         movementSequence.Add(MovementDirection.Down);
+        movementSequenceUI.AddMovement(MovementDirection.Down);
     }
 
     private void OnBeginPressed()
@@ -84,6 +97,11 @@ public class MovementInputs : MonoBehaviour
         GameManager.Instance.BeginExecution();
     }
 
+
+    public void HighlightMovement(int index)
+    {
+        movementSequenceUI.HighlightMovement(index);
+    }
 
 
 
