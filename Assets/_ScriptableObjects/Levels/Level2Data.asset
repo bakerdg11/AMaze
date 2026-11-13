@@ -16,4 +16,4 @@ MonoBehaviour:
   LevelName: 
   LevelPrefab: {fileID: 7533837098444648175, guid: a9179039ece39344dbaab32161f8b69b, type: 3}
   PreparationTime: 20
-  MinimumMovesToComplete: 0
+  MinimumMovesToComplete: 3

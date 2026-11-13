@@ -1,9 +1,14 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.AdaptivePerformance;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
+    [Header("Refernces")]
+    [SerializeField] private LevelManager levelManager;
+    [SerializeField] private StatsManager statsManager;
+
     [Header("Panels")]
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject levelSelectPanel;
@@ -11,22 +16,24 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject losePanel;
 
-    [Header("Main Menu Buttons")]
+    [Header("Main Menu")]
     [SerializeField] private Button selectLevelButton;
     [SerializeField] private Button quitButton;
 
-    [Header("Level Select Buttons")]
+    [Header("Level Select")]
     [SerializeField] private Button backButton;
     [SerializeField] private LevelButtonUI levelButtonPrefab;
     [SerializeField] private Transform levelButtonContainer;
     [SerializeField] private LevelData[] levels;
 
-    [Header("Win Panel Buttons")]
+    [Header("Win Panel")]
     [SerializeField] private Button winTryAgainButton;
     [SerializeField] private Button winNextLevelButton;
     [SerializeField] private Button winSelectLevelButton;
+    [SerializeField] private TMP_Text textInputsNumber;
+    [SerializeField] private TMP_Text textInputsNumberRecord;
 
-    [Header("Lose Panel Buttons")]
+    [Header("Lose Panel")]
     [SerializeField] private Button loseTryAgainButton;
     [SerializeField] private Button loseSelectLevelButton;
 
@@ -78,12 +85,27 @@ public class MenuManager : MonoBehaviour
 
             LevelButtonUI newButton = Instantiate(levelButtonPrefab, levelButtonContainer);
 
-            newButton.Setup(level.LevelNumber, PlayLevel);
+            newButton.Setup(level, statsManager, PlayLevel);
+        }
+    }
+
+    private void RefreshLevelRecords()
+    {
+        LevelButtonUI[] levelButtons = levelButtonContainer.GetComponentsInChildren<LevelButtonUI>(true);
+        
+        foreach (LevelButtonUI levelButton in levelButtons)
+        {
+            levelButton.RefreshRecord();
         }
     }
 
     private void HandleGameStateChanged(GameState newState)
     {
+        if (newState == GameState.Won)
+        {
+            UpdateWinPanelStats();
+        }
+
         winPanel.SetActive(newState == GameState.Won);
         losePanel.SetActive(newState == GameState.Lost);
     }
@@ -107,18 +129,28 @@ public class MenuManager : MonoBehaviour
 
     private void OpenLevelSelect()
     {
+        RefreshLevelRecords();
+
         levelSelectPanel.SetActive(true);
+        mainMenuPanel.SetActive(false);
     }
 
     private void CloseLevelSelect()
     {
         levelSelectPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
     }
 
     private void PlayLevel(int levelNumber)
     {
         GameManager.Instance.LoadLevel(levelNumber);
         BeginGame();
+    }
+
+    private void UpdateWinPanelStats()
+    {
+        textInputsNumber.text = statsManager.InputsUsed.ToString();
+        textInputsNumberRecord.text = statsManager.GetLevelRecord(levelManager.CurrentLevelNumber).ToString();
     }
 
     private void WinNextLevel()
@@ -143,6 +175,8 @@ public class MenuManager : MonoBehaviour
 
     private void WinSelectLevel()
     {
+        RefreshLevelRecords();
+
         hudPanel.SetActive(false);
         levelSelectPanel.SetActive(true);
         winPanel.SetActive(false);
@@ -156,6 +190,8 @@ public class MenuManager : MonoBehaviour
 
     private void LoseSelectLevel()
     {
+        RefreshLevelRecords();
+
         hudPanel.SetActive(false);
         levelSelectPanel.SetActive(true);
         losePanel.SetActive(false);

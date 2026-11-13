@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
   LevelNumber: 3
   LevelName: 
-  LevelPrefab: {fileID: 0}
-  MaxMovementCommands: 0
-  MaxObjectsToPlace: 0
+  LevelPrefab: {fileID: 7533837098444648175, guid: 498840ac2a9bd404fb1d96f99f9d5bda, type: 3}
+  PreparationTime: 30
+  MinimumMovesToComplete: 5
