@@ -9,25 +9,30 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
 
-
-    [Header("Managers")]
+    [Header("References")]
     [SerializeField] private LevelManager levelManager;
     [SerializeField] private MovementInputs movementInputs;
     [SerializeField] private StatsManager statsManager;
+    public SphereMovement CurrentSphereMovement => levelManager.CurrentSphereMovement;
 
+
+    [Header("Game State")]
     public GameState CurrentState { get; private set; } = GameState.MainMenu;
     public event Action<GameState> OnGameStateChanged;
 
+
+    [Header("Level Information")]
     public int CurrentLevelNumber => levelManager.CurrentLevelNumber;
     public LevelData CurrentLevelData => levelManager.CurrentLevelData;
-    public SphereMovement CurrentSphereMovement => levelManager.CurrentSphereMovement;
-
-    [Header("Preparation Timer")]
-    [SerializeField] private TMP_Text countdownText;
-    private float remainingTime;
-    private Coroutine countdownCoroutine;
-
     public bool levelCompleted { get; private set; } = false;
+
+
+    [Header("Countdown")]
+    [SerializeField] private TMP_Text countdownText;
+    private Coroutine countdownCoroutine;
+    private float remainingTime;
+
+
 
     private void Awake()
     {
@@ -184,6 +189,8 @@ public class GameManager : MonoBehaviour
         levelCompleted = true;
 
         statsManager.RecordLevelCompletion(CurrentLevelNumber);
+
+        levelManager.UnlockNextLevel(CurrentLevelNumber);
 
         SetGameState(GameState.Won);
 

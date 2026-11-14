@@ -1,25 +1,40 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-    [Header("Level Settings")]
-    [SerializeField] private LevelData[] levels;
-    [SerializeField] private GameObject spherePrefab;
-    public IReadOnlyList<LevelData> Levels => levels;
-
-    [Header("Manager References")]
+    [Header("References")]
     [SerializeField] private CameraManager cameraManager;
+    [SerializeField] private GameObject spherePrefab;
 
-    public int CurrentLevelNumber { get; private set; } = -1;
+
+    [Header("Level Information")]
+    [SerializeField] private LevelData[] levels;
+    public IReadOnlyList<LevelData> Levels => levels;
     public LevelData CurrentLevelData { get; private set; }
-    public SphereMovement CurrentSphereMovement { get; private set; }
-
+    public int CurrentLevelNumber { get; private set; } = -1;
     private GameObject currentLevel;
+    public int HighestUnlockedLevel { get; private set; } = 1;
+
+
+    [Header("Sphere Information")]
+    public SphereMovement CurrentSphereMovement { get; private set; }
     private GameObject currentSphere;
+
+
+    [Header("Testing")]
+    [SerializeField] private bool testMode = false;
+
 
     public bool LoadLevel(int levelNumber)
     {
+        if (!IsLevelUnlocked(levelNumber))
+        {
+            Debug.LogWarning($"Level {levelNumber} is locked!");
+            return false;
+        }
+
         LevelData levelData = null;
 
         foreach (LevelData level in levels)
@@ -111,4 +126,38 @@ public class LevelManager : MonoBehaviour
         Debug.LogWarning($"Level {nextLevelNumber} does not exist!");
         return false;
     }
+
+    public bool IsLevelUnlocked(int levelNumber)
+    {
+        foreach (LevelData level in levels)
+        {
+            if (level == null || level.LevelNumber != levelNumber) continue;
+
+            return testMode || levelNumber <= HighestUnlockedLevel;
+        }
+
+        return false;
+    }
+
+    public void UnlockNextLevel(int completedLevelNumber)
+    {
+        int nextLevelNumber = completedLevelNumber + 1;
+
+        foreach (LevelData level in levels)
+        {
+            if (level == null || level.LevelNumber != nextLevelNumber) continue;
+
+            if (nextLevelNumber > HighestUnlockedLevel)
+            {
+                HighestUnlockedLevel = nextLevelNumber;
+            }
+
+            return;
+        }
+
+    }
+
+
+
+
 }

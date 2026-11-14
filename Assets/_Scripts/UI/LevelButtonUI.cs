@@ -8,14 +8,18 @@ public class LevelButtonUI : MonoBehaviour
 {
     [Header("References")]
     private LevelData levelData;
+    private LevelManager levelManager;
     private StatsManager statsManager;
 
-    [Header("Buttons and Text")]
+    [Header("Buttons, Texts and Images")]
     [SerializeField] private Button button;
     [SerializeField] private TMP_Text levelText;
     [SerializeField] private TMP_Text levelRecordText;
+    [SerializeField] private GameObject lockIcon;
 
-    [Header("Record Colous")]
+    [Header("Level Seelct Colours")]
+    [SerializeField] private Color unlockedTextColor = Color.white;
+    [SerializeField] private Color lockedTextColor = Color.gray;
     [SerializeField] private Color incompleteColor = Color.white;
     [SerializeField] private Color incompleteRecordColor = Color.red;
     [SerializeField] private Color perfectRecordColor = Color.green;
@@ -27,15 +31,17 @@ public class LevelButtonUI : MonoBehaviour
         button.onClick.AddListener(OnButtonPressed);
     }
 
-    public void Setup(LevelData data, StatsManager stats, Action<int> callback)
+    public void Setup(LevelData data, StatsManager stats, LevelManager manager, Action<int> callback)
     {
         levelData = data;
         statsManager = stats;
+        levelManager = manager;
         onLevelSelected = callback;
 
         levelText.text = $"Level {levelData.LevelNumber}";
 
         RefreshRecord();
+        RefreshUnlockStatus();
     }
 
     public void RefreshRecord()
@@ -61,9 +67,30 @@ public class LevelButtonUI : MonoBehaviour
         }
     }
 
+
+    public void RefreshUnlockStatus()
+    {
+        if (levelData == null || levelManager == null) return;
+
+        bool isUnlocked = levelManager.IsLevelUnlocked(levelData.LevelNumber);
+
+        button.interactable = isUnlocked;
+
+        levelText.color = isUnlocked ? unlockedTextColor : lockedTextColor;
+
+        lockIcon.SetActive(!isUnlocked);
+
+        levelText.gameObject.SetActive(true);
+
+        levelRecordText.gameObject.SetActive(isUnlocked);
+    }
+
+
     private void OnButtonPressed()
     {
-        if (levelData == null) return;
+        if (levelData == null || levelManager == null) return;
+
+        if (!levelManager.IsLevelUnlocked(levelData.LevelNumber)) return;
 
         onLevelSelected?.Invoke(levelData.LevelNumber);
     }

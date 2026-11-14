@@ -24,7 +24,6 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private Button backButton;
     [SerializeField] private LevelButtonUI levelButtonPrefab;
     [SerializeField] private Transform levelButtonContainer;
-    [SerializeField] private LevelData[] levels;
 
     [Header("Win Panel")]
     [SerializeField] private Button winTryAgainButton;
@@ -79,23 +78,24 @@ public class MenuManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (LevelData level in levels)
+        foreach (LevelData level in levelManager.Levels)
         {
             if (level == null) continue;
 
             LevelButtonUI newButton = Instantiate(levelButtonPrefab, levelButtonContainer);
 
-            newButton.Setup(level, statsManager, PlayLevel);
+            newButton.Setup(level, statsManager, levelManager, PlayLevel);
         }
     }
 
-    private void RefreshLevelRecords()
+    private void RefreshLevelButtons()
     {
         LevelButtonUI[] levelButtons = levelButtonContainer.GetComponentsInChildren<LevelButtonUI>(true);
         
         foreach (LevelButtonUI levelButton in levelButtons)
         {
             levelButton.RefreshRecord();
+            levelButton.RefreshUnlockStatus();
         }
     }
 
@@ -129,7 +129,8 @@ public class MenuManager : MonoBehaviour
 
     private void OpenLevelSelect()
     {
-        RefreshLevelRecords();
+        RefreshLevelButtons();
+
 
         levelSelectPanel.SetActive(true);
         mainMenuPanel.SetActive(false);
@@ -175,7 +176,7 @@ public class MenuManager : MonoBehaviour
 
     private void WinSelectLevel()
     {
-        RefreshLevelRecords();
+        RefreshLevelButtons();
 
         hudPanel.SetActive(false);
         levelSelectPanel.SetActive(true);
@@ -190,7 +191,7 @@ public class MenuManager : MonoBehaviour
 
     private void LoseSelectLevel()
     {
-        RefreshLevelRecords();
+        RefreshLevelButtons();
 
         hudPanel.SetActive(false);
         levelSelectPanel.SetActive(true);
